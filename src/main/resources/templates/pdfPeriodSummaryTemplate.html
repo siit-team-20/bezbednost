@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<h2>SUMMARY</h2>
+<p>Period: [[${periodSummary.period.startDate}]] - [[${periodSummary.period.endDate}]]</p>
+<table style="width: 100%; text-align: center;">
+    <thead>
+    <tr>
+        <th style="text-align: left; padding: 8px;">Accommodation</th>
+        <th style="padding: 8px;">Reservations</th>
+        <th style="padding: 8px;">Profit</th>
+    </tr>
+    </thead>
+    <tbody th:each="accommodationData : ${periodSummary.accommodationsData}">
+    <tr style="border-top: 0.5px solid #bababa;">
+        <td style="text-align: left; padding: 8px;">[[${accommodationData.accommodationName}]]</td>
+        <td style="padding: 8px;">[[${accommodationData.reservationsCount}]]</td>
+        <td style="padding: 8px;">[[${accommodationData.totalProfit}]]€</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
