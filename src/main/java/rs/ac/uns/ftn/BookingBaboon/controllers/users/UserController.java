@@ -85,7 +85,7 @@ public class UserController {
         return new ResponseEntity<>( mapper.map(user, UserProfile.class), HttpStatus.OK);
     }*/
 
-    @PreAuthorize("hasAnyAuthority('GUEST', 'HOST', 'ADMIN', 'CERTADMIN')")
+    @PreAuthorize("hasAnyAuthority('GUEST', 'HOST', 'ADMIN')")
     @GetMapping({"/profile/{userId}"})
     public ResponseEntity<UserProfile> getProfile(@PathVariable Long userId) {
 
@@ -126,7 +126,7 @@ public class UserController {
         return new ResponseEntity<>( mapper.map(user, UserResponse.class), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyAuthority('GUEST', 'HOST', 'ADMIN', 'CERTADMIN')")
+    @PreAuthorize("hasAnyAuthority('GUEST', 'HOST', 'ADMIN')")
     @GetMapping("/logout")
     public ResponseEntity logout() {
 
