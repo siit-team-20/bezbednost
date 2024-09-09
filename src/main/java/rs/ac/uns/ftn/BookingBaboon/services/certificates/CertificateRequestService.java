@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import rs.ac.uns.ftn.BookingBaboon.domain.certificates.CertificateRequest;
 import rs.ac.uns.ftn.BookingBaboon.domain.certificates.CertificateRequestStatus;
+import rs.ac.uns.ftn.BookingBaboon.dtos.certificates.CertificateCreateDTO;
+import rs.ac.uns.ftn.BookingBaboon.pki.certificates.CertificateService;
 import rs.ac.uns.ftn.BookingBaboon.repositories.certificates.ICertificateRequestRepository;
 import rs.ac.uns.ftn.BookingBaboon.services.certificates.interfaces.ICertificateRequestService;
 
@@ -24,6 +27,10 @@ import rs.ac.uns.ftn.BookingBaboon.services.certificates.interfaces.ICertificate
 public class CertificateRequestService implements ICertificateRequestService {
     
     private final ICertificateRequestRepository repository;
+
+    @Autowired
+    private final CertificateService certificateService;
+
     ResourceBundle bundle = ResourceBundle.getBundle("ValidationMessages", LocaleContextHolder.getLocale());
 
     @Override
@@ -92,7 +99,7 @@ public class CertificateRequestService implements ICertificateRequestService {
     }
 
     @Override
-    public CertificateRequest approve(Long certificateRequestId) throws ResponseStatusException {
+    public CertificateRequest approve(Long certificateRequestId, CertificateCreateDTO certificateDTO) throws ResponseStatusException {
         Optional<CertificateRequest> found = repository.findById(certificateRequestId);
         if (found.isEmpty()) {
             String value = bundle.getString("certificateRequest.notFound");
@@ -104,7 +111,7 @@ public class CertificateRequestService implements ICertificateRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, value);
         }
         certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
-        sendCertificateRequest(certificateRequest);
+        certificateService.createCertificate(certificateDTO);
         repository.flush();
         return certificateRequest;
     }
