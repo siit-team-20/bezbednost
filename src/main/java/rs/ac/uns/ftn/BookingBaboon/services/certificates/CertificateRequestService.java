@@ -37,6 +37,10 @@ public class CertificateRequestService implements ICertificateRequestService {
     public Collection<CertificateRequest> getAll() {
         return new ArrayList<CertificateRequest>(repository.findAll());
     }
+    
+    public Collection<CertificateRequest> getAllWaiting() {
+        return new ArrayList<CertificateRequest>(repository.findAllByStatus(CertificateRequestStatus.WAITING));
+    }
 
     @Override
     public CertificateRequest get(Long certificateRequestId) throws ResponseStatusException {
