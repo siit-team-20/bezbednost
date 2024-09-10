@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.web.server.ResponseStatusException;
 
 import rs.ac.uns.ftn.BookingBaboon.domain.certificates.CertificateRequest;
+import rs.ac.uns.ftn.BookingBaboon.dtos.certificates.CertificateCreateDTO;
 
 public interface ICertificateRequestService {
     
@@ -18,7 +19,7 @@ public interface ICertificateRequestService {
 
     CertificateRequest remove(Long certificateRequestId);
 
-    CertificateRequest approve(Long certificateRequestId) throws ResponseStatusException;
+    CertificateRequest approve(Long certificateRequestId, CertificateCreateDTO certificateDTO) throws ResponseStatusException;
 
     CertificateRequest reject(Long certificateRequestId) throws ResponseStatusException;
     
