@@ -201,11 +201,11 @@ public class CertificateService {
     public boolean isRoot(X509Certificate certificate) {
         try {
             certificate.verify(certificate.getPublicKey());
+            return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal());
         } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException
                 | SignatureException e) {
-            e.printStackTrace();
+            return false;
         }
-        return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal());
     }
 
     public boolean isCertificateValid(String alias) {
@@ -220,6 +220,7 @@ public class CertificateService {
         while (!isRoot(cert)) {
             try {
                 cert.checkValidity();
+                System.out.println(cert.getSignature());
                 cert.verify(parentCert.getPublicKey());
             } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException
                     | SignatureException e) {
@@ -231,7 +232,7 @@ public class CertificateService {
 
         try {
             cert.checkValidity();
-            cert.verify(parentCert.getPublicKey());
+            cert.verify(cert.getPublicKey());
         } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException
                 | SignatureException e) {
             return false;
@@ -282,19 +283,19 @@ public class CertificateService {
         try {
             keyGenerator = KeyPairGenerator.getInstance("RSA");
             random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-
-            keyGenerator.initialize(4096, random);
-
-            KeyPair keyPair = keyGenerator.generateKeyPair();
-            if (certificateType == CertificateType.Intermediate)
-                this.privateKeyRepository.writePrivateKey(keyPair.getPrivate(), certificateAlias);
-
-            return keyPair;
         } 
         catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
+            String value = bundle.getString("certificate.internalError");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, value);
         }
-        return null;
+
+        keyGenerator.initialize(4096, random);
+
+        KeyPair keyPair = keyGenerator.generateKeyPair();
+        if (certificateType == CertificateType.Intermediate)
+            this.privateKeyRepository.writePrivateKey(keyPair.getPrivate(), certificateAlias);
+
+        return keyPair;
     }
 
     private X509v3CertificateBuilder getCertificateBuilder(
@@ -335,8 +336,8 @@ public class CertificateService {
             return builder.build(issuerPrivateKey);
         }
         catch (OperatorCreationException e) {
-            e.printStackTrace();
-            return null;
+            String value = bundle.getString("certificate.internalError");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, value);
         }
     }
 
@@ -348,8 +349,8 @@ public class CertificateService {
         try {
             return certConverter.getCertificate(certHolder);
         } catch (CertificateException e) {
-            e.printStackTrace();
-            return null;
+            String value = bundle.getString("certificate.internalError");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, value);
         }
     }
 
@@ -361,11 +362,12 @@ public class CertificateService {
 
         X509Certificate certificateAuthority = getX509CertificateFromAlias(certificateDTO.getAlias());
 
-        JcaX509CertificateHolder certificateAuthorityHolder = null;
+        JcaX509CertificateHolder certificateAuthorityHolder;
         try {
             certificateAuthorityHolder = new JcaX509CertificateHolder(certificateAuthority);
         } catch (CertificateEncodingException e) {
-            e.printStackTrace();
+            String value = bundle.getString("certificate.internalError");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, value);
         }
         X500Name issuerName = certificateAuthorityHolder.getSubject();
 
@@ -419,7 +421,8 @@ public class CertificateService {
             }
         }
         catch (CertIOException e) {
-            e.printStackTrace();
+            String value = bundle.getString("certificate.internalError");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, value);
         }
 
         X509Certificate certificate = signAndBuildCertificate(certGenerator, getContentSigner(certificateDTO.getAlias()));
