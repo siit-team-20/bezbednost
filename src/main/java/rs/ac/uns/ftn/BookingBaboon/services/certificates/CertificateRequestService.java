@@ -104,7 +104,7 @@ public class CertificateRequestService implements ICertificateRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, value);
         }
         certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
-        sendCertificateRequest(certificateRequest);
+        // sendCertificateRequest(certificateRequest);
         repository.flush();
         return certificateRequest;
     }
