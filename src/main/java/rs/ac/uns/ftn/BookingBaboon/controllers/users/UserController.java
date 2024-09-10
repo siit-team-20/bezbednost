@@ -7,14 +7,10 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import rs.ac.uns.ftn.BookingBaboon.config.security.JwtTokenUtil;
 import rs.ac.uns.ftn.BookingBaboon.domain.notifications.NotificationType;
 import rs.ac.uns.ftn.BookingBaboon.domain.users.User;
 import rs.ac.uns.ftn.BookingBaboon.dtos.users.*;
@@ -32,8 +28,6 @@ public class UserController {
 
     private final IUserService service;
     private final ModelMapper mapper;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenUtil jwtTokenUtil;
     private final SecurityContext sc = SecurityContextHolder.getContext();
 
     @GetMapping
@@ -105,26 +99,26 @@ public class UserController {
         return new ResponseEntity<>( mapper.map(user, UserResponse.class), HttpStatus.OK);
     }
 
-    @PostMapping({"/login"})
-    public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request){
-        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(request.getEmail(),
-                request.getPassword());
-        Authentication auth = authenticationManager.authenticate(authReq);
+    // @PostMapping({"/login"})
+    // public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest request){
+    //     UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(request.getEmail(),
+    //             request.getPassword());
+    //     Authentication auth = authenticationManager.authenticate(authReq);
 
-        sc.setAuthentication(auth);
+    //     sc.setAuthentication(auth);
 
-        User user = service.getByEmail(request.getEmail());
+    //     User user = service.getByEmail(request.getEmail());
 
-        if (!user.isActive()){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+    //     if (!user.isActive()){
+    //         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    //     }
 
-        UserDetails userDetails = service.loadUserByUsername(user.getEmail());
-        String token = jwtTokenUtil.generateToken(userDetails, user.getId());
-        user.setJwt(token);
+    //     UserDetails userDetails = service.loadUserByUsername(user.getEmail());
+    //     String token = jwtTokenUtil.generateToken(userDetails, user.getId());
+    //     user.setJwt(token);
 
-        return new ResponseEntity<>( mapper.map(user, UserResponse.class), HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>( mapper.map(user, UserResponse.class), HttpStatus.OK);
+    // }
 
     @PreAuthorize("hasAnyAuthority('GUEST', 'HOST', 'ADMIN')")
     @GetMapping("/logout")

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import rs.ac.uns.ftn.BookingBaboon.domain.certificates.CertificateRequest;
 import rs.ac.uns.ftn.BookingBaboon.dtos.certificates.CertificateCreateDTO;
@@ -27,6 +28,7 @@ import rs.ac.uns.ftn.BookingBaboon.services.certificates.interfaces.ICertificate
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/certificate-requests")
+@SecurityRequirement(name = "Keycloak")
 public class CertificateRequestController {
     private final ICertificateRequestService service;
     private final ModelMapper mapper;

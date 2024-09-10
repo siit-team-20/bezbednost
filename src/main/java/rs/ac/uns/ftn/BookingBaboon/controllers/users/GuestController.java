@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.BookingBaboon.controllers.users;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +12,7 @@ import rs.ac.uns.ftn.BookingBaboon.domain.notifications.NotificationType;
 import rs.ac.uns.ftn.BookingBaboon.domain.users.Guest;
 import rs.ac.uns.ftn.BookingBaboon.dtos.accommodation_handling.accommodation.AccommodationResponse;
 import rs.ac.uns.ftn.BookingBaboon.dtos.users.guests.*;
+import rs.ac.uns.ftn.BookingBaboon.services.users.LdapUserService;
 import rs.ac.uns.ftn.BookingBaboon.services.users.interfaces.IGuestService;
 
 import java.util.Collection;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class GuestController {
     private final IGuestService service;
     private final ModelMapper mapper;
+    @Autowired
+    private LdapUserService ldapUserService;
 
     @GetMapping
     public ResponseEntity<Collection<GuestResponse>> getGuests() {
@@ -44,7 +48,9 @@ public class GuestController {
 
     @PostMapping({"/"})
     public ResponseEntity<GuestResponse> create(@RequestBody GuestCreateRequest guest) {
-        return new ResponseEntity<>(mapper.map(service.create(mapper.map(guest, Guest.class)),GuestResponse.class), HttpStatus.CREATED);
+        Guest result = service.create(mapper.map(guest, Guest.class));
+        ldapUserService.createUser(result.getId().toString(), result.getEmail(), guest.getPassword(), result.getFirstName(), result.getLastName(), "guest");
+        return new ResponseEntity<>(mapper.map(result,GuestResponse.class), HttpStatus.CREATED);
     }
 
     @PutMapping({"/"})
