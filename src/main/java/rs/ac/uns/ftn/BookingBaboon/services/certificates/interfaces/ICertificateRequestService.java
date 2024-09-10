@@ -10,6 +10,8 @@ import rs.ac.uns.ftn.BookingBaboon.dtos.certificates.CertificateCreateDTO;
 public interface ICertificateRequestService {
     
     Collection<CertificateRequest> getAll();
+    
+    Collection<CertificateRequest> getAllWaiting();
 
     CertificateRequest get(Long certificateRequestId) throws ResponseStatusException;
 

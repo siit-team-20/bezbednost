@@ -1,6 +1,8 @@
 package rs.ac.uns.ftn.BookingBaboon.controllers.certificates;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -42,6 +44,17 @@ public class CertificateRequestController {
                 .map(certificateRequest -> mapper.map(certificateRequest, CertificateRequestResponseDTO.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
 
+    }
+
+    @GetMapping({"/waiting"})
+    public ResponseEntity<Collection<CertificateRequestResponseDTO>> getAllWaiting() {
+
+        Collection<CertificateRequest> certificateRequests = service.getAllWaiting();
+
+    
+        return new ResponseEntity<>(certificateRequests.stream()
+        .map(certificateRequest -> mapper.map(certificateRequest, CertificateRequestResponseDTO.class))
+        .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
